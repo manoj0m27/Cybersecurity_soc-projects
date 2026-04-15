@@ -1,0 +1,929 @@
+{
+  "name": "phishing URL analyzer",
+  "nodes": [
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "c20ccf04-6cc8-4d56-ac73-8fb4b62f34a4",
+              "leftValue": "={{ $json.risk }}",
+              "rightValue": "HIGH",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        2064,
+        1392
+      ],
+      "id": "a643a10e-d8fd-4179-a5a1-0d8940cc7c29",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "chatId": "=1295084447",
+        "text": "=⚠️ PHISHING ALERT DETECTED\n\nURL: {{ $('code for combain all outputs').item.json.data.requests[0].request.request.url }}\n\nRisk Level: {{$json.risk}}\n\nVirusTotal Results:\nMalicious: {{ $('code for combain all outputs').item.json.malicious }}\nSuspicious: {{ $('code for combain all outputs').item.json.suspicious }}\n\nDomain: {{ $('code for combain all outputs').item.json.task.domain }}\nDomain Age : {{ $('code for combain all outputs').item.json.page.domainAgeDays }}\nDon't Open This link Manoj",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2288,
+        1392
+      ],
+      "id": "e2c53338-63a6-4002-8f34-d8c15ab19b60",
+      "name": "Send a text message",
+      "webhookId": "1ae23086-0b22-45cc-b0a4-da40fb1c5c21",
+      "credentials": {
+        "telegramApi": {
+          "id": "IqaSnrcUOCwpFFHv",
+          "name": "EmailAlerts"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 10
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        688,
+        1104
+      ],
+      "id": "06420b27-3de3-46e9-ab70-c29bc41f8c32",
+      "name": "Wait",
+      "webhookId": "c27e9761-d9ab-41c1-a89f-f355b8d05a61"
+    },
+    {
+      "parameters": {
+        "format": "resolved",
+        "options": {
+          "customEmailConfig": "[\"UNSEEN\"]",
+          "forceReconnect": 2
+        }
+      },
+      "type": "n8n-nodes-base.emailReadImap",
+      "typeVersion": 2.1,
+      "position": [
+        -496,
+        1392
+      ],
+      "id": "cc0139c9-9708-4aea-bc21-d83f668d9c07",
+      "name": "Email Trigger (IMAP)",
+      "credentials": {
+        "imap": {
+          "id": "6WqB0Qv3U8SxYlhs",
+          "name": "manoj"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.url_count }}",
+        "options": {
+          "systemMessage": "=You are a cybersecurity phishing detection system.\n\nAnalyze the email content and URL for phishing indicators.\n\nLook for:\n- Urgent language\n- Fake login requests\n- Credential harvesting attempts\n- Suspicious domains\n- Social engineering tactics\nHere is Input:\n{{ $json.url_count }}\nReturn only JSON in this format:\n\n{\n \"phishing_probability\": 0-100,\n \"threat_level\": \"LOW | MEDIUM | HIGH\",\n \"reason\": \"short explanation\"\n} "
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        512,
+        1680
+      ],
+      "id": "f1240510-69ba-4dd2-81ad-1bb55a1a1b14",
+      "name": "AI Agent",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "numberInputs": 4
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1392,
+        1360
+      ],
+      "id": "ccf5be8e-caaa-4c7f-bdb5-cb364a409fab",
+      "name": "Merge",
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "amount": 10
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        880,
+        1488
+      ],
+      "id": "30edfacc-3f71-4582-974f-70c4b0deeb0d",
+      "name": "Wait1",
+      "webhookId": "40645f78-e83d-49f8-b0c2-50c42605369a"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.urls[0].url }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.urlScanIo",
+      "typeVersion": 1,
+      "position": [
+        592,
+        1296
+      ],
+      "id": "7f854da5-b510-4a0a-80a9-7a392ecc9795",
+      "name": "Perform a scan",
+      "credentials": {
+        "urlScanIoApi": {
+          "id": "e8TqYUZj2bYMsk7a",
+          "name": "urlscan.io manoj"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 60
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        880,
+        1296
+      ],
+      "id": "b8689185-791a-42ac-8622-997dafe65021",
+      "name": "Wait2",
+      "webhookId": "47262ad3-dc10-4eb7-9687-5a9169b04fe4"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "scanId": "={{ $json.scanId }}"
+      },
+      "type": "n8n-nodes-base.urlScanIo",
+      "typeVersion": 1,
+      "position": [
+        1168,
+        1296
+      ],
+      "id": "28543570-2e16-437f-880a-a59348db17d8",
+      "name": "Get a scan",
+      "credentials": {
+        "urlScanIoApi": {
+          "id": "e8TqYUZj2bYMsk7a",
+          "name": "urlscan.io manoj"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://www.virustotal.com/api/v3/urls",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-apikey",
+              "value": "b524842709c1ebe9f26600cce485b456327b418854d810b57168975867b52f10"
+            },
+            {
+              "name": "Content-Type",
+              "value": "=application/x-www-form-urlencoded"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "url",
+              "value": "={{ $json.urls[0].url }}"
+            },
+            {
+              "name": "domain",
+              "value": "={{ $json.urls[0].domain }}"
+            },
+            {
+              "name": "attached ",
+              "value": "={{ $json.attachments }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        480,
+        1120
+      ],
+      "id": "8191860e-4d9f-4888-bae2-16dbd9d473eb",
+      "name": "HTTP post virustotal"
+    },
+    {
+      "parameters": {
+        "url": "=https://www.virustotal.com/api/v3/analyses/{{ $json.data.id }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-apikey",
+              "value": "b524842709c1ebe9f26600cce485b456327b418854d810b57168975867b52f10"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        880,
+        1104
+      ],
+      "id": "f97d096b-c232-4452-8bb3-099f52174588",
+      "name": "get output"
+    },
+    {
+      "parameters": {
+        "jsCode": "const stats = $json.data.attributes.stats;\n\nconst malicious = stats.malicious;\nconst suspicious = stats.suspicious;\nconst harmless = stats.harmless;\n\nreturn [{\n  json: {\n    malicious,\n    suspicious,\n    harmless,\n    total: malicious + suspicious + harmless\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1168,
+        1104
+      ],
+      "id": "94b81b20-d4ab-485f-92cc-db5fea1b7e05",
+      "name": "understand output"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://www.whoisxmlapi.com/whoisserver/WhoisService",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "domainName",
+              "value": "={{ $json.urls[0].domain }}"
+            },
+            {
+              "name": "apiKey",
+              "value": "at_ZqHrvk1EDDSBlgZiZgOKjM2Xb2Vol"
+            }
+          ]
+        },
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        592,
+        1488
+      ],
+      "id": "c7c61afb-81c2-462f-a9bc-4f4fc060d50c",
+      "name": "whois domain check"
+    },
+    {
+      "parameters": {
+        "jsCode": "const xml = $json.data || \"\";\n\n// extract values using regex\nconst created = xml.match(/<createdDate>(.*?)<\\/createdDate>/);\nconst updated = xml.match(/<updatedDate>(.*?)<\\/updatedDate>/);\nconst expires = xml.match(/<expiresDate>(.*?)<\\/expiresDate>/);\nconst registrar = xml.match(/<registrarName>(.*?)<\\/registrarName>/);\nconst domain = xml.match(/<domainName>(.*?)<\\/domainName>/);\nconst country = xml.match(/<country>(.*?)<\\/country>/);\n\nreturn [\n{\njson:{\ndomain: domain ? domain[1] : \"unknown\",\ncreatedDate: created ? created[1] : \"\",\nupdatedDate: updated ? updated[1] : \"\",\nexpiresDate: expires ? expires[1] : \"\",\nregistrar: registrar ? registrar[1] : \"\",\ncountry: country ? country[1] : \"\"\n}\n}\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1168,
+        1488
+      ],
+      "id": "b0635246-fd77-4064-b6e8-7d8ac76aaee7",
+      "name": "understand output1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const content = $json.output;\n\nconst result = JSON.parse(content);\n\nreturn [{\n  json: {\n    phishing_probability: result.phishing_probability,\n    threat_level: result.threat_level,\n    reason: result.reason\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1040,
+        1680
+      ],
+      "id": "125763e1-c0a2-4612-8326-f06e290ff800",
+      "name": "understand output2",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nlet result = {};\n\nitems.forEach(item => {\n\nObject.assign(result, item.json);\n\n});\n\nreturn [\n{\njson: result\n}\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1616,
+        1392
+      ],
+      "id": "9591583d-7485-40cc-832d-0302b19d7515",
+      "name": "code for combain all outputs"
+    },
+    {
+      "parameters": {
+        "jsCode": "let risk = \"LOW\";\n\nif($json.malicious > 0){\nrisk=\"HIGH\";\n}\n\nif($json.suspicious > 0){\nrisk=\"MEDIUM\";\n}\n\nreturn [{\njson:{\nrisk:risk,\nurl:$json.url\n}\n}]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1840,
+        1392
+      ],
+      "id": "de84affe-c501-4d4a-95b9-8ca0850fcef4",
+      "name": "check risk"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Combine text + html safely\nconst emailText = ($json.text || \"\") + \" \" + ($json.html || \"\");\n\n// Extract URLs (clean)\nconst urlRegex = /(https?:\\/\\/[^\\s\"'<>]+)/g;\nlet rawUrls = emailText.match(urlRegex) || [];\n\n// Clean URLs (remove junk like \", </a>, etc.)\nconst cleanedUrls = rawUrls.map(u => {\n  return u.replace(/[\"'<>]/g, '').trim();\n});\n\n// Extract domains safely\nconst urls = cleanedUrls.map(url => {\n  try {\n    const domain = new URL(url).hostname;\n    return { url, domain };\n  } catch (e) {\n    return { url, domain: \"invalid-url\" };\n  }\n});\n\n// Extract attachments\nconst attachments = [];\nif (items[0].binary) {\n  for (const key in items[0].binary) {\n    attachments.push({\n      fileName: items[0].binary[key].fileName,\n      mimeType: items[0].binary[key].mimeType,\n      binaryProperty: key\n    });\n  }\n}\n\nreturn [{\n  json: {\n    urls,\n    url_count: urls.length,\n    attachment_count: attachments.length,\n    attachments\n  },\n  binary: items[0].binary\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -272,
+        1392
+      ],
+      "id": "66cab8b0-433e-4630-941d-20296870aba9",
+      "name": "extract urls from mail,domain,attachments"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "e279e318-a71b-4820-87f1-7c39c4768c43",
+              "leftValue": "={{ $json.attachment_count }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -48,
+        1392
+      ],
+      "id": "fdac638a-a634-4be0-8f15-b830f9bc8698",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "amount": 10
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        688,
+        928
+      ],
+      "id": "9423be03-6310-4208-96a1-85d28fd4ac95",
+      "name": "Wait3",
+      "webhookId": "c27e9761-d9ab-41c1-a89f-f355b8d05a61"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://www.virustotal.com/api/v3/files",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-apikey",
+              "value": "b524842709c1ebe9f26600cce485b456327b418854d810b57168975867b52f10"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "={{ $json.binaryProperty }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        464,
+        928
+      ],
+      "id": "8f5059e5-b593-451c-bfec-7e6270e96f85",
+      "name": "HTTP post virustotal1"
+    },
+    {
+      "parameters": {
+        "url": "=https://www.virustotal.com/api/v3/analyses/{{ $json.data.id }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-apikey",
+              "value": "b524842709c1ebe9f26600cce485b456327b418854d810b57168975867b52f10"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        912,
+        928
+      ],
+      "id": "4d774c05-4a14-4a0d-b9a9-5a131ce0ca12",
+      "name": "get output1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const stats = $json.data.attributes.stats;\n\nconst malicious = stats.malicious || 0;\nconst suspicious = stats.suspicious || 0;\n\nlet risk = \"LOW\";\n\nif (malicious > 5) risk = \"HIGH\";\nelse if (malicious > 0 || suspicious > 0) risk = \"MEDIUM\";\n\nreturn [{\n  json: {\n    malicious,\n    suspicious,\n    risk\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1136,
+        928
+      ],
+      "id": "ec4bc00b-8b6a-45a8-90c7-ea7b8ec120ab",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "c1b76586-5fe3-4b40-b410-c4850b391152",
+              "leftValue": "={{ $json.risk }}",
+              "rightValue": "HIGH",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1360,
+        928
+      ],
+      "id": "db887f6e-0b28-4013-9cf3-45d10d612430",
+      "name": "If2"
+    },
+    {
+      "parameters": {
+        "chatId": "=1295084447",
+        "text": "=🚨 Malware Detection Alert\n\n📎 Attachment scanned\n\n🦠 Malicious: {{ $('Code in JavaScript1').item.json.malicious }}\n⚠️ Suspicious: {{ $('Code in JavaScript1').item.json.suspicious }}\n\n🔥 Risk Level: {{ $('Code in JavaScript1').item.json.risk }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1584,
+        928
+      ],
+      "id": "83cd3579-3b96-432c-a71a-b73f909f7c12",
+      "name": "Send a text message1",
+      "webhookId": "1ae23086-0b22-45cc-b0a4-da40fb1c5c21",
+      "credentials": {
+        "telegramApi": {
+          "id": "IqaSnrcUOCwpFFHv",
+          "name": "EmailAlerts"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        880,
+        1904
+      ],
+      "id": "568cdf30-197c-4597-b62a-b0e591d3dd68",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "VL0GGOiytuJr44I9",
+          "name": "Groq account manoj"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const attachment = $json.attachments[0];\n\nreturn [{\n  json: attachment,\n  binary: items[0].binary\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        928
+      ],
+      "id": "dd4b9c94-f48b-406d-854d-e9c414421de3",
+      "name": "code attachment s"
+    },
+    {
+      "parameters": {
+        "jsCode": "const urlsArray = $json.urls || [];\n\n// Clean + fix broken URLs\nconst cleaned = urlsArray\n  .map(u => u.url)\n  .flatMap(u => u.split(']')) // split broken combined URLs\n  .map(u => u.trim())\n  .filter(u => u.startsWith('http')); // keep valid only\n\n// remove duplicates\nconst uniqueUrls = [...new Set(cleaned)];\n\n// return MULTIPLE ITEMS\nreturn uniqueUrls.map(u => ({\n  json: {\n    url: u\n  }\n}));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        192,
+        2768
+      ],
+      "id": "32cb6f22-ae21-4a26-bebf-9044708eecb4",
+      "name": "Code in JavaScript",
+      "disabled": true
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "get output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email Trigger (IMAP)": {
+      "main": [
+        [
+          {
+            "node": "extract urls from mail,domain,attachments",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "understand output2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "code for combain all outputs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait1": {
+      "main": [
+        [
+          {
+            "node": "understand output1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Perform a scan": {
+      "main": [
+        [
+          {
+            "node": "Wait2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait2": {
+      "main": [
+        [
+          {
+            "node": "Get a scan",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a scan": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "HTTP post virustotal": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get output": {
+      "main": [
+        [
+          {
+            "node": "understand output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "understand output": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "whois domain check": {
+      "main": [
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "understand output1": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "understand output2": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 3
+          }
+        ]
+      ]
+    },
+    "code for combain all outputs": {
+      "main": [
+        [
+          {
+            "node": "check risk",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "check risk": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "extract urls from mail,domain,attachments": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "code attachment s",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Perform a scan",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "whois domain check",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "HTTP post virustotal",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait3": {
+      "main": [
+        [
+          {
+            "node": "get output1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP post virustotal1": {
+      "main": [
+        [
+          {
+            "node": "Wait3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get output1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If2": {
+      "main": [
+        [
+          {
+            "node": "Send a text message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "code attachment s": {
+      "main": [
+        [
+          {
+            "node": "HTTP post virustotal1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "5de5f019-fc34-4486-a696-473ab2368b49",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "f51ce4480477e1ea1850cff800198c0a1c391f9959199bc418780fbaf1efe913"
+  },
+  "id": "-_6V_fQKL7G2FFZr_gYbn",
+  "tags": []
+}
